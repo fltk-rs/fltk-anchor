@@ -16,22 +16,41 @@ fltk-anchor = "0.1"
 use fltk::{prelude::*, *};
 use fltk_anchor::{Anchor, Anchored};
 
+const PADDING: i32 = 8;
+
 fn main() {
     let a = app::App::default();
     let mut win = window::Window::default().with_size(400, 300);
-    button::Button::new(10, 10, 80, 40, "Click").with_anchor(Anchor::Left | Anchor::Top | Anchor::Bottom);
+
+    button::Button::new(PADDING, PADDING, 80, 40, "Click").with_anchor(Anchor::Left | Anchor::Top);
+
+    input::MultilineInput::new(
+        PADDING,
+        PADDING * 2 + 40,
+        400 - PADDING * 2,
+        300 - 40 - PADDING * 3,
+        "",
+    )
+    .with_anchor(Anchor::Left | Anchor::Right | Anchor::Top | Anchor::Bottom);
+
     win.end();
+
     win.make_resizable(true);
     win.show();
+
     a.run().unwrap();
 }
 ```
-This indicates to fltk that when resizing, the button shouldn't move left, top nor bottom (the height is fixed). However, the right side which is not anchored, will cause the button's width to be modified when resizing.
+This indicates to fltk that when resizing, the button has a fixed size and position, while the input fills the remaining part of the window.
 */
 
 #![allow(non_upper_case_globals)]
+#![allow(clippy::needless_doctest_main)]
 
-use fltk::{enums::Event, prelude::{WidgetExt, WidgetBase}};
+use fltk::{
+    enums::Event,
+    prelude::{WidgetBase, WidgetExt},
+};
 
 bitflags::bitflags! {
     pub struct Anchor: i32 {
@@ -58,46 +77,54 @@ where
     T: WidgetExt + WidgetBase,
 {
     fn set_anchor(&mut self, anchor: Anchor) {
+        let parent = self.parent().unwrap();
+        let p_w = parent.w();
+        let p_h = parent.h();
         let x = self.x();
         let y = self.y();
         let w = self.w();
         let h = self.h();
+        let d_w = p_w - w;
+        let d_h = p_h - h;
         self.handle(move |s, ev| match ev {
             Event::Resize => {
+                let parent = s.parent().unwrap();
+                let p_w = parent.w();
+                let p_h = parent.h();
                 if anchor == Anchor::Left {
-                    s.resize(x, s.y(), s.w(), s.h());
-                } else if anchor == Anchor::Right {
-                    s.resize(s.x(), s.y(), w, s.h());
-                } else if anchor == Anchor::Top {
-                    s.resize(s.x(), y, s.w(), s.h());
-                } else if anchor == Anchor::Bottom {
-                    s.resize(s.x(), s.y(), s.w(), h);
-                } else if anchor == Anchor::Left | Anchor::Right {
-                    s.resize(x, s.y(), w, s.h());
-                } else if anchor == Anchor::Top | Anchor::Right {
-                    s.resize(s.x(), y, w, s.h());
-                } else if anchor == Anchor::Bottom | Anchor::Right {
-                    s.resize(s.x(), s.y(), w, h);
-                } else if anchor == Anchor::Top | Anchor::Left {
-                    s.resize(x, y, s.w(), s.h());
-                } else if anchor == Anchor::Bottom | Anchor::Left {
-                    s.resize(x, s.y(), s.w(), h);
-                } else if anchor == Anchor::Top | Anchor::Bottom {
-                    s.resize(s.x(), y, s.w(), h);
-                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Left {
-                    s.resize(x, y, s.w(), h);
-                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Right {
-                    s.resize(s.x(), y, w, h);
-                } else if anchor == Anchor::Top | Anchor::Left | Anchor::Right {
-                    s.resize(x, y, w, s.h());
-                } else if anchor == Anchor::Bottom | Anchor::Left | Anchor::Right {
                     s.resize(x, s.y(), w, h);
-                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Left | Anchor::Right {
+                } else if anchor == Anchor::Right {
+                    s.resize(s.x(), s.y(), p_w - d_w, h);
+                } else if anchor == Anchor::Top {
+                    s.resize(s.x(), y, w, h);
+                } else if anchor == Anchor::Bottom {
+                    s.resize(s.x(), s.y(), w, p_h - d_h);
+                } else if anchor == Anchor::Left | Anchor::Right { 
+                    s.resize(x, s.y(), p_w - d_w, h);
+                } else if anchor == Anchor::Top | Anchor::Right {
+                    s.resize(s.x(), y, p_w - d_w, h);
+                } else if anchor == Anchor::Bottom | Anchor::Right {
+                    s.resize(s.x(), s.y(), p_w - d_w, p_h - d_h);
+                } else if anchor == Anchor::Top | Anchor::Left {
                     s.resize(x, y, w, h);
+                } else if anchor == Anchor::Bottom | Anchor::Left {
+                    s.resize(x, s.y(), w, p_h - d_h);
+                } else if anchor == Anchor::Top | Anchor::Bottom {
+                    s.resize(s.x(), y, w, p_h - d_h);
+                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Left {
+                    s.resize(x, y, w, p_h - d_h);
+                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Right {
+                    s.resize(s.x(), y, p_w - d_w, p_h - d_h);
+                } else if anchor == Anchor::Top | Anchor::Left | Anchor::Right {
+                    s.resize(x, y, p_w - d_w, h);
+                } else if anchor == Anchor::Bottom | Anchor::Left | Anchor::Right {
+                    s.resize(x, s.y(),  p_w - d_w, p_h - d_h);
+                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Left | Anchor::Right {
+                    s.resize(x, y, p_w - d_w, p_h - d_h);
                 } else {
                     //
                 }
-                true
+                false
             }
             _ => false,
         });
