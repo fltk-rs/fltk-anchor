@@ -86,6 +86,8 @@ where
         let h = self.h();
         let d_w = p_w - w;
         let d_h = p_h - h;
+        let d_x = p_w - x;
+        let d_y = p_h - y;
         self.handle(move |s, ev| match ev {
             Event::Resize => {
                 let parent = s.parent().unwrap();
@@ -102,13 +104,13 @@ where
                 } else if anchor == Anchor::Left | Anchor::Right { 
                     s.resize(x, s.y(), p_w - d_w, h);
                 } else if anchor == Anchor::Top | Anchor::Right {
-                    s.resize(s.x(), y, p_w - d_w, h);
+                    s.resize(p_w - d_x, y, w, h);
                 } else if anchor == Anchor::Bottom | Anchor::Right {
-                    s.resize(s.x(), s.y(), p_w - d_w, p_h - d_h);
+                    s.resize(p_w - d_x, p_h - d_y, w, h);
                 } else if anchor == Anchor::Top | Anchor::Left {
                     s.resize(x, y, w, h);
                 } else if anchor == Anchor::Bottom | Anchor::Left {
-                    s.resize(x, s.y(), w, p_h - d_h);
+                    s.resize(x, p_h - d_y, w, h);
                 } else if anchor == Anchor::Top | Anchor::Bottom {
                     s.resize(s.x(), y, w, p_h - d_h);
                 } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Left {
