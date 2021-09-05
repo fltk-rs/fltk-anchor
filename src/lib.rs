@@ -94,15 +94,15 @@ where
                 let p_w = parent.w();
                 let p_h = parent.h();
                 if anchor == Anchor::Left {
-                    s.resize(x, s.y(), w, h);
+                    s.resize(x, p_h - d_y, w, h);
                 } else if anchor == Anchor::Right {
-                    s.resize(s.x(), s.y(), p_w - d_w, h);
+                    s.resize(p_w - d_x, p_h - d_y, w, h);
                 } else if anchor == Anchor::Top {
-                    s.resize(s.x(), y, w, h);
+                    s.resize(p_w - d_x, y, w, h);
                 } else if anchor == Anchor::Bottom {
-                    s.resize(s.x(), s.y(), w, p_h - d_h);
-                } else if anchor == Anchor::Left | Anchor::Right { 
-                    s.resize(x, s.y(), p_w - d_w, h);
+                    s.resize(p_w - d_x, p_h - d_y, w, h);
+                } else if anchor == Anchor::Left | Anchor::Right { // ?
+                    s.resize(x, p_h - d_y, p_w - d_w, h);
                 } else if anchor == Anchor::Top | Anchor::Right {
                     s.resize(p_w - d_x, y, w, h);
                 } else if anchor == Anchor::Bottom | Anchor::Right {
@@ -111,20 +111,20 @@ where
                     s.resize(x, y, w, h);
                 } else if anchor == Anchor::Bottom | Anchor::Left {
                     s.resize(x, p_h - d_y, w, h);
-                } else if anchor == Anchor::Top | Anchor::Bottom {
-                    s.resize(s.x(), y, w, p_h - d_h);
+                } else if anchor == Anchor::Top | Anchor::Bottom { // ?
+                    s.resize(p_w - d_x, y, w, p_h - d_h);
                 } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Left {
                     s.resize(x, y, w, p_h - d_h);
-                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Right {
+                } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Right { // ?
                     s.resize(s.x(), y, p_w - d_w, p_h - d_h);
                 } else if anchor == Anchor::Top | Anchor::Left | Anchor::Right {
                     s.resize(x, y, p_w - d_w, h);
-                } else if anchor == Anchor::Bottom | Anchor::Left | Anchor::Right {
+                } else if anchor == Anchor::Bottom | Anchor::Left | Anchor::Right { // ?
                     s.resize(x, s.y(),  p_w - d_w, p_h - d_h);
                 } else if anchor == Anchor::Top | Anchor::Bottom | Anchor::Left | Anchor::Right {
                     s.resize(x, y, p_w - d_w, p_h - d_h);
-                } else {
-                    //
+                } else { // ? None
+                    s.resize(p_w - d_x, p_h - d_y, w, h);
                 }
                 false
             }
