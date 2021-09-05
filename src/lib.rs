@@ -77,7 +77,7 @@ where
     T: WidgetExt + WidgetBase,
 {
     fn set_anchor(&mut self, anchor: Anchor) {
-        let parent = self.parent().unwrap();
+        let parent = self.top_window().unwrap();
         let p_w = parent.w();
         let p_h = parent.h();
         let x = self.x();
@@ -90,7 +90,6 @@ where
         let d_y = p_h - y;
         self.handle(move |s, ev| match ev {
             Event::Resize => {
-                let parent = s.parent().unwrap();
                 let p_w = parent.w();
                 let p_h = parent.h();
                 if anchor == Anchor::Left {
