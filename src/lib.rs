@@ -53,6 +53,7 @@ use fltk::{
 };
 
 bitflags::bitflags! {
+    #[derive(Debug, Clone, Ord, Hash, PartialOrd, Eq, PartialEq, Copy)]
     pub struct Anchor: i32 {
         const None = 0;
         const Left = 10;
